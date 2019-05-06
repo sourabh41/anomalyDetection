@@ -28,17 +28,17 @@ A single frame is represented by the average of its neighbors. The first Gaussia
 ## Results
 
 We obtain a maximum of 67.49% accuracy of detecting abnormal frames in the UCSD dataset.
-Frame by frame example of an anomaly :
+Frame by frame example of an anomaly (a person using a skateboard) :
 
-![Frame 1](/images/008_052.tif?raw=true "Frame 1")
-![Frame 2](/images/008_053.tif?raw=true "Frame 2")
-![Frame 3](/images/008_054.tif?raw=true "Frame 3")
-![Frame 4](/images/008_055.tif?raw=true "Frame 4")
-![Frame 5](/images/008_056.tif?raw=true "Frame 5")
-![Frame 6](/images/008_057.tif?raw=true "Frame 6")
-![Frame 7](/images/008_058.tif?raw=true "Frame 7")
-![Frame 8](/images/008_059.tif?raw=true "Frame 8")
-![Frame 9](/images/008_060.tif?raw=true "Frame 9")
+![Frame 1](./images/008_052.tif?raw=true "Frame 1")
+![Frame 2](./images/008_053.tif?raw=true "Frame 2")
+![Frame 3](./images/008_054.tif?raw=true "Frame 3")
+![Frame 4](./images/008_055.tif?raw=true "Frame 4")
+![Frame 5](./images/008_056.tif?raw=true "Frame 5")
+![Frame 6](./images/008_057.tif?raw=true "Frame 6")
+![Frame 7](./images/008_058.tif?raw=true "Frame 7")
+![Frame 8](./images/008_059.tif?raw=true "Frame 8")
+![Frame 9](./images/008_060.tif?raw=true "Frame 9")
 
 
 ## Observations
