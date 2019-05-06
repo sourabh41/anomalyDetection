@@ -26,17 +26,19 @@ DATA_LIST = ["sample_uscd1seq"]#,"mall1seq","mall2seq","mall3seq","sub_entry","s
 
 # To be tuned
 
-epochs = 10
+epochs = 50
 batch_size = 32
 rho = 0.05
 gamma = 3
 lr = 1e-3
-phi = 5
-alpha = 10
+phi = 50
+alpha = 25
 beta = 5
-
+useSavedModel = True
+saveModel = False
+PATH = './sparseEncoderModel'
 # CREATE MODEL INSTANCE 
-#######################################################s################################################
+#######################################################################################################
 def train():
 	model_ft = myModel()
 	mean_cov_dict = dict()
@@ -48,17 +50,25 @@ def train():
 		with open(DATASETS_DIR+dataset_name+"_train.pkl", 'rb') as f:
 			train_data = pickle.load(f)
 
-		print("Training SparseAutoencoder")
 		FCNtrain_outputs = model_ft.getOutputs(train_data)
 
-		sparse_auto_encoder = SparseAutoencoder(192, 50)
-		optimizer = optim.Adam(sparse_auto_encoder.parameters(), lr=lr)
-		sparse_auto_encoder.train(optimizer,torch.stack(FCNtrain_outputs),epochs,batch_size,rho,gamma)
 
-		# train another gaussian classifier on these sparse_auto_encoder_output for suspicious regions
+		if(useSavedModel):
+			print("Loading Sparse Encoder Model")
+			sparse_auto_encoder = torch.load(PATH)
+
+		else:
+			print("Training SparseAutoencoder")
+			sparse_auto_encoder = SparseAutoencoder(192, 500)
+			optimizer = optim.Adam(sparse_auto_encoder.parameters(), lr=lr)
+			sparse_auto_encoder.train(optimizer,torch.stack(FCNtrain_outputs),epochs,batch_size,rho,gamma)
+
+		if(saveModel):
+			print("Saving Sparse Encoder Model")
+			torch.save(sparse_auto_encoder, PATH)
+
+
 		sparse_auto_encoder_outputs = sparse_auto_encoder.forward(torch.stack(FCNtrain_outputs))
-
-
 		print("Training GaussianClassifier")
 		mean_cov_dict[dataset_name] = [trainGaussianClassifier(FCNtrain_outputs), trainGaussianClassifier(list(sparse_auto_encoder_outputs))]
 
@@ -94,21 +104,21 @@ def test(mean_cov_dict, model_ft, sparse_auto_encoder,alpha, beta, phi):
 			for frame in range(test_frame.shape[0]):
 				abnormal_regions[(vid,frame)] = []
 				frame_output = FCNtest_outputs[vid][frame]
-				distances = mahalanobisDistance(frame_output,meanG1,covarianceG1)
+				distancesG1 = mahalanobisDistance(frame_output,meanG1,covarianceG1)
+				distancesG2 = mahalanobisDistance(sparse_auto_encoder_outputs[vid,frame],meanG2,covarianceG2)
+
 				# print(frame_output.shape)
 				for i in range(23):
 					for j in range(23):
-						if(distances[i,j] > alpha):
+						if(distancesG1[i,j] > alpha):
 							abnormal_frames[vid][frame] = 1
 							abnormal_positions[vid][frame,i,j] = 1
 							abnormal_regions[(vid,frame)].append(getRegionfromAlex(torch.Tensor([[i,j]])))
-						elif(distances[i,j] > beta):
-							dist = mahalanobisDistance(torch.unsqueeze(torch.unsqueeze(sparse_auto_encoder_outputs[vid,frame,:,i,j],1),2),meanG2,covarianceG2)
-							if(dist > phi):
+						elif(distancesG1[i,j] > beta):
+							if(distancesG2[i,j] > phi):
 								abnormal_frames[vid][frame] = 1
 								abnormal_positions[vid][frame,i,j] = 1
 								abnormal_regions[(vid,frame)].append(getRegionfromAlex(torch.Tensor([[i,j]])))
-
 
 
 		#print(abnormal_regions[(0,0)])
@@ -125,13 +135,13 @@ def test(mean_cov_dict, model_ft, sparse_auto_encoder,alpha, beta, phi):
 
 
 def main():
-	mean_cov_dict , model_ft, sparse_auto_encoder = train( )
+	mean_cov_dict , model_ft, sparse_auto_encoder = train()
 	"""for alpha in range(242,260,2):
 					accuracy = test(mean_cov_dict = mean_cov_dict, model_ft = model_ft, alpha = alpha*1.0/10, beta = 5, )
 					print(alpha*1.0/10, accuracy)"""
 	#optimum alpha 25.2 accuracy - 67.49%
 	accuracy = test(mean_cov_dict = mean_cov_dict, model_ft = model_ft, sparse_auto_encoder = sparse_auto_encoder, alpha = alpha, beta = beta, phi = phi)
-	print("Accuracy obtained is" , accuracy)
+	# print("Accuracy obtained is" , accuracy)
 
 if __name__ == '__main__':
 	main()

@@ -47,7 +47,8 @@ class SparseAutoencoder(nn.Module):
 				optimizer.zero_grad()
 				loss.backward()
 				optimizer.step()
-			print("Loss :",loss.data[0].item())
+			print("Loss :",loss.data[0].item(), "MSE Loss :", MSE_loss[0].item())
+
 		
 
 

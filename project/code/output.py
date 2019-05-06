@@ -74,16 +74,31 @@ def saveAbnormalRegions(abnormal_frames, abnormal_positions, abnormal_regions, d
 
 def calculateAccuracy(abnormal_frames, dataset_name):
     labels_path = DATASETS_DIR + dataset_name + "_labels_test.pkl"
-
     with open(labels_path, 'rb') as f:
         labels = pickle.load(f)
 
     accuracy = []
     total_frames = 0
+    true_positives = 0
+    false_positives = 0
+    true_negatives = 0
+    false_negatives = 0
     for i in range(len(abnormal_frames)):
+        true_positives = true_positives + torch.sum(labels[i].int()*abnormal_frames[i].int())
+        true_negatives = true_negatives + torch.sum(torch.eq(labels[i],0).float() * torch.eq(abnormal_frames[i],0).float())
+        false_positives = false_positives + torch.sum(abnormal_frames[i].float() * torch.eq(labels[i],0).float())
+        false_negatives = false_negatives + torch.sum(labels[i].float() * torch.eq(abnormal_frames[i],0).float())
         accuracy.append(torch.sum(torch.eq(labels[i].int(), abnormal_frames[i].int())))
         total_frames += (labels[i].shape)[0]
     
 
-
-    return float(sum(accuracy)*100)/(1.0*total_frames)
+    precision = float(true_positives/(true_positives+false_positives))
+    recall = float(true_positives/(true_positives+false_negatives))
+    fpr = float(false_positives/(false_positives+true_negatives))
+    accuracy = float(sum(accuracy)*100)/(1.0*total_frames)
+    print("Accuracy :",accuracy)
+    print("FPR :",fpr)
+    print("Precision :",precision)
+    print("Recall :",recall)
+    print("F1 Score :", float((2*precision*recall)/(precision+recall)))
+    return accuracy
