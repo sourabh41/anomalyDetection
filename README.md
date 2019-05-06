@@ -14,9 +14,9 @@ Features are extracted from a frame using a pretrained alexnet model, and we tra
 
 We used two datasets, UCSD pedestrian dataset and Subway dataset
 
-UCSD : Dominant dynamic objects in this dataset are walkerswhere crowd density varies from low to high.  An appearing object such as acar, skateboarder, wheelchair, or bicycle is considered to create an anomaly.
+UCSD : Dominant dynamic objects in this dataset are walkers where crowd density varies from low to high.  An appearing object such as a car, skateboarder, wheelchair, or bicycle is considered to create an anomaly.
 
-Subway : This dataset contains two sequences recorded at the entrance and exit of a subwaystation.  People entering and exiting the station usually behave normally.  Ab-normal events are defined by people moving in the wrong direction, or avoiding payment.
+Subway : This dataset contains two sequences recorded at the entrance and exit of a subway station.  People entering and exiting the station usually behave normally.  Abnormal events are defined by people moving in the wrong direction, or avoiding payment.
 
 
 ## Model 
@@ -43,7 +43,7 @@ Frame by frame example of an anomaly (a person using a skateboard) :
 
 ## Observations
 
-We used two pretrained alexnet models for the fixed part of the network, one trained on the imageNet database and other on the places365 database. While we expect the network trained on the places365 database to perform better as it classifies based on the scenes, it performed poorer than the on trained on ImageNet. 
+We used two pretrained alexnet models for the fixed part of the network, one trained on the imageNet database and other on the places365 database. While we expect the network trained on the places365 database to perform better as it classifies based on the scenes, it performed poorer than the network trained on ImageNet. 
 
 
 ## References
